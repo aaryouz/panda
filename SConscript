@@ -112,10 +112,29 @@ def build_project(project_name, project, main, extra_flags):
   bs_env.Objcopy(f"./board/obj/bootstub.{project_name}.bin", bs_elf)
 
   # Build + sign main (aka app)
+  common_sources = [
+    "./board/libc.c",
+    "./board/critical.c", 
+    "./board/faults.c",
+    "./board/utils.c",
+    "./board/provision.c",
+    "./board/power_saving.c",
+    "./board/early_init.c",
+    "./board/flasher.c",
+    "./board/can_comms.c",
+  ]
+  
+  # Platform-specific sources
+  platform_sources = []
+  if "STM32F4" in project_name.upper():
+    platform_sources.append("./board/stm32f4/platform.c")
+  elif "STM32H7" in project_name.upper() or "H7" in project_name.upper():
+    platform_sources.append("./board/stm32h7/platform.c")
+    
   main_elf = env.Program(f"{project_dir}/main.elf", [
     startup,
     main
-  ], LINKFLAGS=[f"-Wl,--section-start,.isr_vector={project['APP_START_ADDRESS']}"] + flags)
+  ] + common_sources + platform_sources, LINKFLAGS=[f"-Wl,--section-start,.isr_vector={project['APP_START_ADDRESS']}"] + flags)
   main_bin = env.Objcopy(f"{project_dir}/main.bin", main_elf)
   sign_py = File(f"./crypto/sign.py").srcnode().relpath
   env.Command(f"./board/obj/{project_name}.bin.signed", main_bin, f"SETLEN=1 {sign_py} $SOURCE $TARGET {cert_fn}")
