@@ -1,8 +1,17 @@
-extern int _app_start[0xc000]; // Only first 3 sectors of size 0x4000 are used
+#include "comms.h"
+#include "board_declarations.h"
+#include "health.h"
+#include "can_declarations.h"
+#include "uart_declarations.h"
+#include "libc.h"
+#include "safety/safety.h"
+#include "can_common_declarations.h"
+#include "can_comms.h"
+#include "faults.h"
+#include "power_saving.h"
+#include "provision.h"
 
-// Prototypes
-void set_safety_mode(uint16_t mode, uint16_t param);
-bool is_car_safety_mode(uint16_t mode);
+// Implementations here...
 
 static int get_health_pkt(void *dat) {
   COMPILE_TIME_ASSERT(sizeof(struct health_t) <= USBPACKET_MAX_SIZE);
@@ -339,4 +348,4 @@ int comms_control_handler(ControlPacket_t *req, uint8_t *resp) {
       break;
   }
   return resp_len;
-}
+} 

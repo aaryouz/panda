@@ -100,6 +100,15 @@ def build_project(project_name, project, main, extra_flags):
 
   startup = env.Object(project["STARTUP_FILE"])
 
+  # Common sources for main firmware
+  common_sources = [
+    'board/faults.c',
+    'board/power_saving.c',
+    'board/comms.c',
+    'board/drivers/usb.c',
+    # Add other new .c files here
+  ]
+
   # Build bootstub
   bs_env = env.Clone()
   bs_env.Append(CFLAGS="-DBOOTSTUB", ASFLAGS="-DBOOTSTUB", LINKFLAGS="-DBOOTSTUB")
@@ -112,10 +121,8 @@ def build_project(project_name, project, main, extra_flags):
   bs_env.Objcopy(f"./board/obj/bootstub.{project_name}.bin", bs_elf)
 
   # Build + sign main (aka app)
-  main_elf = env.Program(f"{project_dir}/main.elf", [
-    startup,
-    main
-  ], LINKFLAGS=[f"-Wl,--section-start,.isr_vector={project['APP_START_ADDRESS']}"] + flags)
+  main_sources = [startup] + common_sources + [main]
+  main_elf = env.Program(f"{project_dir}/main.elf", main_sources, LINKFLAGS=[f"-Wl,--section-start,.isr_vector={project['APP_START_ADDRESS']}"] + flags)
   main_bin = env.Objcopy(f"{project_dir}/main.bin", main_elf)
   sign_py = File(f"./crypto/sign.py").srcnode().relpath
   env.Command(f"./board/obj/{project_name}.bin.signed", main_bin, f"SETLEN=1 {sign_py} $SOURCE $TARGET {cert_fn}")

@@ -20,4 +20,4 @@ extern bool heartbeat_lost;
 extern bool heartbeat_disabled;            // set over USB
 
 // siren state
-extern bool siren_enabled;
+extern bool siren_enabled; 
