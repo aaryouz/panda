@@ -1,3 +1,6 @@
+#ifndef COMMS_DEFINITIONS_H
+#define COMMS_DEFINITIONS_H
+
 typedef struct {
   uint8_t request;
   uint16_t param1;
@@ -10,3 +13,5 @@ void comms_endpoint2_write(const uint8_t *data, uint32_t len);
 void comms_can_write(const uint8_t *data, uint32_t len);
 int comms_can_read(uint8_t *data, uint32_t max_len);
 void comms_can_reset(void);
+
+#endif /* COMMS_DEFINITIONS_H */

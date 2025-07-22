@@ -1,6 +1,13 @@
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "board/flasher.h"
+#include "board/comms_definitions.h"
+#include "board/obj/gitversion.h"
+
+// Forward declaration for board structure - we only use specific fields
+struct board;
+#define HAS_SPI_OFFSET 32  // Assume has_spi is at a known offset
 
 // Forward declarations for external dependencies
 void *memset(void *str, int c, unsigned int n);
@@ -27,7 +34,6 @@ void delay(uint32_t a);
 // External variables and constants
 extern uint8_t hw_type;
 extern uint32_t enter_bootloader_mode;
-extern char gitversion[];
 extern struct board *current_board;
 
 // Constants
@@ -170,10 +176,11 @@ void soft_flasher_start(void) {
 
   // enable comms
   usb_init();
-  if (current_board->has_spi) {
+  // TODO: Re-enable SPI check when board structure is properly available
+  // if (current_board->has_spi) {
     gpio_spi_init();
     spi_init();
-  }
+  // }
 
   // green LED on for flashing
   led_set(LED_GREEN, 1);

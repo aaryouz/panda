@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "board/early_init.h"
+#include "board/config.h"
 
 // STM32 peripheral includes will be needed for DBGMCU and SCB
 // These are defined in the STM32 HAL headers that are included via config
